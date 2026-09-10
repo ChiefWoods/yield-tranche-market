@@ -1,5 +1,5 @@
 [workspace]
-members = ["programs/yield-tranche-market"]
+members = ["crates/yield-tranche-market-core","programs/yield-tranche-market"]
 resolver = "2"
 
 [workspace.package]
