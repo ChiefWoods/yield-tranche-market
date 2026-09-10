@@ -1,6 +1,7 @@
-[package]
-name = "yield-tranche-market"
-version = "0.1.0"
-edition = "2024"
+[workspace]
+members = ["programs/yield-tranche-market"]
+resolver = "2"
 
-[dependencies]
+[workspace.package]
+edition = "2021"
+version = "0.1.0"
