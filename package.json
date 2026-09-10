@@ -1,0 +1,27 @@
+{
+  "name": "yield-tranche-market",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check-types": "tsc --noEmit",
+    "lint": "oxlint --fix",
+    "lint:check": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@blueshift-gg/quasar-svm": "^0.1.12",
+    "@solana/codecs": "^6.0.0",
+    "@solana/kit": "^6.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.3.0",
+    "oxfmt": "^0.62.0",
+    "oxlint": "^1.77.0",
+    "typescript": "^5.9.3"
+  }
+}
