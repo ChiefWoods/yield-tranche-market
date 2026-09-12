@@ -18,11 +18,16 @@ idl-build = ["quasar-lang/idl-build"]
 
 [dependencies]
 quasar-lang = { git = "https://github.com/blueshift-gg/quasar", branch = "master" }
+quasar-spl = { git = "https://github.com/blueshift-gg/quasar", branch = "master" }
 solana-instruction = { version = "3.2.0" }
+solana-math = { workspace = true, features = ["quasar"] }
+solmath.workspace = true
+zeropod = "=0.3.3"
+fix.workspace = true
+yield-tranche-market-core = { path = "../../crates/yield-tranche-market-core" }
 
 [dev-dependencies]
 quasar-svm = { version = "0.1" }
 solana-account = { version = "3.4.0" }
-solana-address = { version = "2.2.0", features = ["decode"] }
 solana-instruction = { version = "3.2.0", features = ["bincode"] }
 solana-pubkey = { version = "4.1.0" }

@@ -4,3 +4,6 @@ edition.workspace = true
 version.workspace = true
 
 [dependencies]
+fix.workspace = true
+solana-math.workspace = true
+solmath.workspace = true

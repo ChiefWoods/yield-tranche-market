@@ -5,3 +5,8 @@ resolver = "2"
 [workspace.package]
 edition = "2021"
 version = "0.1.0"
+
+[workspace.dependencies]
+fix = { version = "0.1.1", features = ["i128"] }
+solana-math = { version = "0.4.1", features = ["fix"] }
+solmath = { version = "0.2.0", default-features = false, features = ["transcendental"] }
