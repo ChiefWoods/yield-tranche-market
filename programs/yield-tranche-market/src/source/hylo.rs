@@ -1,9 +1,8 @@
 use quasar_lang::{
     keys_eq,
-    pda::find_program_address_const,
     prelude::{AccountView, Address},
 };
-use quasar_spl::{get_associated_token_address_with_program_const, SPL_TOKEN_ID};
+use quasar_spl::{ATA_PROGRAM_ID, SPL_TOKEN_ID};
 use yield_tranche_market_core::{fixed::Fix, utils::read_u64};
 
 use crate::{errors::YieldTrancheMarketError, utils::read_address};
@@ -18,10 +17,16 @@ pub const HYLO_PROGRAM: Address = Address::new_from_array([
     154, 155, 244, 236, 32, 127, 136, 39, 150, 113, 225,
 ]);
 
-const HYLO_DISCRIMINATOR: [u8; 8] = [114, 161, 169, 210, 204, 175, 149, 174];
-const HYLO_STABLECOIN_MINT_OFFSET: usize = 8 + 32 * 3;
-const TOKEN_ACCOUNT_AMOUNT_OFFSET: usize = 64;
-const MINT_SUPPLY_OFFSET: usize = 36;
+// HYEXCHtHkBagdStcJCp3xbbb9B7sdMdWXFNj6mdsG4hn
+pub const HYLO_EXCHANGE_PROGRAM: Address = Address::new_from_array([
+    245, 187, 72, 160, 4, 116, 48, 134, 197, 164, 152, 189, 233, 219, 27, 124, 201, 65, 103, 243,
+    58, 82, 140, 90, 13, 150, 83, 40, 223, 158, 124, 33,
+]);
+
+pub(crate) const HYLO_DISCRIMINATOR: [u8; 8] = [114, 161, 169, 210, 204, 175, 149, 174];
+pub(crate) const HYLO_STABLECOIN_MINT_OFFSET: usize = 8 + 32 * 3;
+pub(crate) const TOKEN_ACCOUNT_AMOUNT_OFFSET: usize = 64;
+pub(crate) const MINT_SUPPLY_OFFSET: usize = 36;
 
 pub(crate) fn validate(
     underlying_mint: &Address,
@@ -33,10 +38,8 @@ pub(crate) fn validate(
         return Err(YieldTrancheMarketError::InvalidAccountCount);
     };
 
-    for account in [hylo, pool_config] {
-        if !account.owned_by(&HYLO_PROGRAM) {
-            return Err(YieldTrancheMarketError::InvalidAccountOwner);
-        }
+    if !hylo.owned_by(&HYLO_EXCHANGE_PROGRAM) || !pool_config.owned_by(&HYLO_PROGRAM) {
+        return Err(YieldTrancheMarketError::InvalidAccountOwner);
     }
     for account in [stablecoin_mint, stablecoin_pool, lp_token_mint] {
         if !account.owned_by(&SPL_TOKEN_ID) {
@@ -58,17 +61,23 @@ pub(crate) fn validate(
         return Err(YieldTrancheMarketError::InvalidAccountAddress);
     }
 
-    let expected_pool_config = find_program_address_const(&[b"pool_config"], &HYLO_PROGRAM).0;
-    let expected_pool_auth = find_program_address_const(&[b"pool_auth"], &HYLO_PROGRAM).0;
-    let expected_stablecoin_mint = find_program_address_const(&[b"hyUSD"], &HYLO_PROGRAM).0;
-    let expected_lp_token_mint = find_program_address_const(&[b"staked_hyUSD"], &HYLO_PROGRAM).0;
-    let expected_stablecoin_pool = get_associated_token_address_with_program_const(
-        pool_auth.address(),
-        stablecoin_mint.address(),
-        &SPL_TOKEN_ID,
+    let expected_hylo = Address::find_program_address(&[b"hylo"], &HYLO_EXCHANGE_PROGRAM).0;
+    let expected_pool_config = Address::find_program_address(&[b"pool_config"], &HYLO_PROGRAM).0;
+    let expected_pool_auth = Address::find_program_address(&[b"pool_auth"], &HYLO_PROGRAM).0;
+    let expected_stablecoin_mint =
+        Address::find_program_address(&[b"hyUSD"], &HYLO_EXCHANGE_PROGRAM).0;
+    let expected_lp_token_mint = Address::find_program_address(&[b"staked_hyUSD"], &HYLO_PROGRAM).0;
+    let expected_stablecoin_pool = Address::find_program_address(
+        &[
+            pool_auth.address().as_ref(),
+            SPL_TOKEN_ID.as_ref(),
+            stablecoin_mint.address().as_ref(),
+        ],
+        &ATA_PROGRAM_ID,
     )
     .0;
-    if !keys_eq(pool_config.address(), &expected_pool_config)
+    if !keys_eq(hylo.address(), &expected_hylo)
+        || !keys_eq(pool_config.address(), &expected_pool_config)
         || !keys_eq(pool_auth.address(), &expected_pool_auth)
         || !keys_eq(stablecoin_mint.address(), &expected_stablecoin_mint)
         || !keys_eq(stablecoin_pool.address(), &expected_stablecoin_pool)

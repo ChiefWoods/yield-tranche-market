@@ -27,7 +27,14 @@ fix.workspace = true
 yield-tranche-market-core = { path = "../../crates/yield-tranche-market-core" }
 
 [dev-dependencies]
+base64 = "0.22"
 quasar-svm = { version = "0.1" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
 solana-account = { version = "3.4.0" }
+solana-address = { version = "2.2.0", features = ["curve25519", "decode"] }
 solana-instruction = { version = "3.2.0", features = ["bincode"] }
+solana-program-pack = "3.1.0"
 solana-pubkey = { version = "4.1.0" }
+wincode = { version = "=0.4.9", features = ["derive"] }
+yield_tranche_market-client = { path = "../../target/client/rust/yield_tranche_market-client" }

@@ -1,6 +1,5 @@
 use quasar_lang::{
     keys_eq,
-    pda::find_program_address_const,
     prelude::{AccountView, Address},
 };
 use quasar_spl::SPL_TOKEN_ID;
@@ -22,14 +21,14 @@ pub const HUMA_PROGRAM: Address = Address::new_from_array([
     5, 37, 183, 42, 44, 197, 113, 154, 208, 119, 177,
 ]);
 
-const POOL_CONFIG_DISCRIMINATOR: [u8; 8] = [26, 108, 14, 123, 116, 230, 129, 43];
-const POOL_STATE_DISCRIMINATOR: [u8; 8] = [247, 237, 227, 245, 215, 195, 222, 70];
-const MODE_CONFIG_DISCRIMINATOR: [u8; 8] = [249, 180, 144, 225, 126, 159, 202, 209];
+pub(crate) const POOL_CONFIG_DISCRIMINATOR: [u8; 8] = [26, 108, 14, 123, 116, 230, 129, 43];
+pub(crate) const POOL_STATE_DISCRIMINATOR: [u8; 8] = [247, 237, 227, 245, 215, 195, 222, 70];
+pub(crate) const MODE_CONFIG_DISCRIMINATOR: [u8; 8] = [249, 180, 144, 225, 126, 159, 202, 209];
 const MODE_CONFIG_ID_OFFSET: usize = 8 + 2;
 const POOL_CONFIG_POOL_ID_OFFSET: usize = 8 + 1 + 32 * 4 + 1;
-const POOL_STATE_MODE_STATES_OFFSET: usize = 8 + 1 + 1 + 16;
-const MODE_STATE_LEN: usize = 216;
-const MINT_SUPPLY_OFFSET: usize = 36;
+pub(crate) const POOL_STATE_MODE_STATES_OFFSET: usize = 8 + 1 + 1 + 16;
+pub(crate) const MODE_STATE_LEN: usize = 216;
+pub(crate) const MINT_SUPPLY_OFFSET: usize = 36;
 
 pub(crate) fn validate(
     underlying_mint: &Address,
@@ -60,15 +59,15 @@ pub(crate) fn validate(
     let pool_id = read_address(pool_config_data, POOL_CONFIG_POOL_ID_OFFSET)
         .ok_or(YieldTrancheMarketError::InvalidAccountData)?;
     let expected_pool_config =
-        find_program_address_const(&[b"pool_config", pool_id.as_ref()], &HUMA_PROGRAM).0;
-    let expected_pool_state = find_program_address_const(
+        Address::find_program_address(&[b"pool_config", pool_id.as_ref()], &HUMA_PROGRAM).0;
+    let expected_pool_state = Address::find_program_address(
         &[b"pool_state", pool_config.address().as_ref()],
         &HUMA_PROGRAM,
     )
     .0;
     let mode_id = read_address(mode_config_data, MODE_CONFIG_ID_OFFSET)
         .ok_or(YieldTrancheMarketError::InvalidAccountData)?;
-    let expected_mode_config = find_program_address_const(
+    let expected_mode_config = Address::find_program_address(
         &[
             b"mode_config",
             pool_config.address().as_ref(),
@@ -77,7 +76,7 @@ pub(crate) fn validate(
         &HUMA_PROGRAM,
     )
     .0;
-    let expected_mode_mint = find_program_address_const(
+    let expected_mode_mint = Address::find_program_address(
         &[
             b"mode_mint",
             pool_config.address().as_ref(),

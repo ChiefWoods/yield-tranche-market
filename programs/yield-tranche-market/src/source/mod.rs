@@ -1,5 +1,5 @@
-mod huma;
-mod hylo;
+pub(crate) mod huma;
+pub(crate) mod hylo;
 
 use quasar_lang::prelude::{AccountView, Address};
 use yield_tranche_market_core::fixed::{Fix, FIX_SCALE};
